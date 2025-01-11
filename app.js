@@ -1,10 +1,15 @@
 import fastify from 'fastify';
 import packageData from './package.json' assert {type: "json"};
+import db from "./controllers/databaseController.js";
 import dotenv from 'dotenv';
 dotenv.config()
 
 // Site Routes
 import siteRoutes from './routes/index.js'
+import apiRoutes from "./api/routes/index.js";
+
+// API token authentication
+import verifyToken from "./api/routes/verifyToken.js";
 
 //
 // Application Boot
@@ -18,6 +23,13 @@ const buildApp = async () => {
             // Routes
             siteRoutes(instance);
             next();
+        });
+
+        await app.register((instance, options, next) => {
+          // API routes (Token authenticated)
+          instance.addHook("preValidation", verifyToken);
+          apiRoutes(instance, db);
+          next();
         });
 
         const port = process.env.PORT;
