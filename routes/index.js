@@ -1,8 +1,8 @@
 import fetch from 'node-fetch';
-import cheerio from 'cheerio';
+import * as cheerio from "cheerio";
 import moment from "moment";
 import xml2js from 'xml2js';
-import { removeHtmlEntities } from '../app';
+import { removeHtmlEntities } from '../app.js';
 
 export default function applicationSiteRoutes(app) {
     app.get('/', async function (req, res) {

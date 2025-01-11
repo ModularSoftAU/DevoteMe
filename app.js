@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config()
 
 // Site Routes
-import siteRoutes from './routes'
+import siteRoutes from './routes/index.js'
 
 //
 // Application Boot
