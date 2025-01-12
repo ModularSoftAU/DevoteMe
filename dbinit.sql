@@ -23,3 +23,12 @@ CREATE TABLE devotions (
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tenantId) REFERENCES tenants(tenantId)
 );
+
+CREATE TABLE votd (
+    votdId INT PRIMARY KEY AUTO_INCREMENT,
+    tenantId BIGINT NOT NULL,
+    messageId VARCHAR(255) UNIQUE NOT NULL,
+    userId BIGINT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId)
+);
