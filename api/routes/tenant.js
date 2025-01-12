@@ -80,29 +80,68 @@ export default function tenantApiRoute(app, db) {
   // Update tenant endpoint
   app.post(baseEndpoint + "/update", async function (req, res) {
     const tenantId = required(req.body, "tenantId", res);
-    const tenantName = required(req.body, "tenantName", res);
-    const tenantConfiguration = required(req.body, "tenantConfiguration", res);
+    const votdChannel = optional(req.body, "votd_channel", res);
+    const devotionChannel = optional(req.body, "devotion_channel", res);
 
     try {
-      await db.query(
-        `
-          UPDATE tenants 
-          SET 
-            tenantName=?
-            tenantConfiguration=?
-          WHERE tenantId=?;
-        `,
-        [tenantName, tenantConfiguration, tenantId]
+      // Check if the tenant's configuration already exists
+      const existingConfig = await db.query(
+        `SELECT id FROM tenantConfiguration WHERE tenantId = ?`,
+        [tenantId]
       );
 
-      return res.send({
-        success: true,
-        message: `Tenant updated`,
-      });
+      let updateFields = [];
+      let updateValues = [];
+
+      if (votdChannel) {
+        updateFields.push("votd_channel = ?");
+        updateValues.push(votdChannel);
+      }
+
+      if (devotionChannel) {
+        updateFields.push("devotion_channel = ?");
+        updateValues.push(devotionChannel);
+      }
+
+      // Check if there are fields to update
+      if (updateFields.length > 0) {
+        updateValues.push(tenantId); // Add tenantId for the WHERE clause
+
+        // If configuration exists, update the fields
+        if (existingConfig.length > 0) {
+          await db.query(
+            `
+          UPDATE tenantConfiguration
+          SET ${updateFields.join(", ")}
+          WHERE tenantId = ?;
+        `,
+            updateValues
+          );
+        } else {
+          // If configuration doesn't exist, insert new values
+          await db.query(
+            `
+          INSERT INTO tenantConfiguration (tenantId, ${updateFields.join(", ")})
+          VALUES (?, ?);
+        `,
+            [tenantId, ...updateValues]
+          );
+        }
+
+        return res.send({
+          success: true,
+          message: `Tenant configuration updated`,
+        });
+      } else {
+        return res.send({
+          success: false,
+          message: "No valid fields provided to update.",
+        });
+      }
     } catch (error) {
       res.send({
         success: false,
-        message: `${error}`,
+        message: `Error: ${error.message}`,
       });
     }
   });

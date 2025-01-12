@@ -6,6 +6,14 @@ CREATE TABLE tenants (
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE tenantConfiguration (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  tenantId INT NOT NULL,
+  devotion_channel BIGINT,
+  votd_channel BIGINT,
+  FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
+);
+
 CREATE TABLE prayers (
     prayerId INT PRIMARY KEY AUTO_INCREMENT,
     tenantId BIGINT NOT NULL,
