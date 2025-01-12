@@ -1,4 +1,5 @@
 CREATE DATABASE devoteMe;
+USE devoteMe;
 
 CREATE TABLE tenants (
     tenantId BIGINT PRIMARY KEY,
@@ -7,11 +8,11 @@ CREATE TABLE tenants (
 );
 
 CREATE TABLE tenantConfiguration (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  tenantId INT NOT NULL,
-  devotion_channel BIGINT,
-  votd_channel BIGINT,
-  FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tenantId BIGINT NOT NULL,
+    devotion_channel BIGINT,
+    votd_channel BIGINT,
+    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
 );
 
 CREATE TABLE prayers (
@@ -20,7 +21,7 @@ CREATE TABLE prayers (
     messageId VARCHAR(255) NOT NULL,
     userId BIGINT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId)
+    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
 );
 
 CREATE TABLE devotions (
@@ -29,7 +30,7 @@ CREATE TABLE devotions (
     messageId VARCHAR(255) UNIQUE NOT NULL,
     userId BIGINT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId)
+    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
 );
 
 CREATE TABLE votd (
@@ -38,5 +39,5 @@ CREATE TABLE votd (
     messageId VARCHAR(255) UNIQUE NOT NULL,
     userId BIGINT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId)
+    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
 );

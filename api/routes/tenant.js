@@ -60,10 +60,16 @@ export default function tenantApiRoute(app, db) {
     const tenantName = required(req.body, "tenantName", res);
 
     try {
+      // Insert into tenants table
       await db.query(
         `INSERT INTO tenants (tenantId, tenantName) VALUES (?, ?)`,
         [tenantId, tenantName]
       );
+
+      // Insert into tenantConfiguration table with the tenantId
+      await db.query(`INSERT INTO tenantConfiguration (tenantId) VALUES (?)`, [
+        tenantId,
+      ]);
 
       res.send({
         success: true,
@@ -72,7 +78,7 @@ export default function tenantApiRoute(app, db) {
     } catch (error) {
       res.send({
         success: false,
-        message: `${error}`,
+        message: `${error.message}`,
       });
     }
   });
@@ -84,47 +90,43 @@ export default function tenantApiRoute(app, db) {
     const devotionChannel = optional(req.body, "devotion_channel", res);
 
     try {
-      // Check if the tenant's configuration already exists
-      const existingConfig = await db.query(
-        `SELECT id FROM tenantConfiguration WHERE tenantId = ?`,
-        [tenantId]
-      );
-
-      let updateFields = [];
-      let updateValues = [];
+      // Determine the field and value to update
+      let fieldToUpdate = "";
+      let valueToUpdate = null;
 
       if (votdChannel) {
-        updateFields.push("votd_channel = ?");
-        updateValues.push(votdChannel);
+        fieldToUpdate = "votd_channel";
+        valueToUpdate = votdChannel;
+      } else if (devotionChannel) {
+        fieldToUpdate = "devotion_channel";
+        valueToUpdate = devotionChannel;
       }
 
-      if (devotionChannel) {
-        updateFields.push("devotion_channel = ?");
-        updateValues.push(devotionChannel);
-      }
+      if (fieldToUpdate) {
+        // Check if the tenant's configuration already exists in tenantConfiguration
+        const existingConfig = await db.query(
+          `SELECT id FROM tenantConfiguration WHERE tenantId = ?`,
+          [tenantId]
+        );
 
-      // Check if there are fields to update
-      if (updateFields.length > 0) {
-        updateValues.push(tenantId); // Add tenantId for the WHERE clause
-
-        // If configuration exists, update the fields
         if (existingConfig.length > 0) {
+          // If configuration exists, update the field
           await db.query(
             `
           UPDATE tenantConfiguration
-          SET ${updateFields.join(", ")}
+          SET ${fieldToUpdate} = ?
           WHERE tenantId = ?;
-        `,
-            updateValues
+          `,
+            [valueToUpdate, tenantId]
           );
         } else {
           // If configuration doesn't exist, insert new values
           await db.query(
             `
-          INSERT INTO tenantConfiguration (tenantId, ${updateFields.join(", ")})
+          INSERT INTO tenantConfiguration (tenantId, ${fieldToUpdate})
           VALUES (?, ?);
-        `,
-            [tenantId, ...updateValues]
+          `,
+            [tenantId, valueToUpdate]
           );
         }
 
@@ -135,10 +137,12 @@ export default function tenantApiRoute(app, db) {
       } else {
         return res.send({
           success: false,
-          message: "No valid fields provided to update.",
+          message: "No valid field provided to update.",
         });
       }
     } catch (error) {
+      console.log(error);
+
       res.send({
         success: false,
         message: `Error: ${error.message}`,
