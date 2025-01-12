@@ -54,6 +54,34 @@ export default function tenantApiRoute(app, db) {
     }
   });
 
+  // Get tenant configuration by ID endpoint
+  app.get(baseEndpoint + "/configuration/get", async function (req, res) {
+    const tenantId = required(req.query, "id", res);
+
+    try {
+      // Get Tenant Configuration by specific ID
+      const dbQuery = `SELECT * FROM tenantConfiguration WHERE tenantId = ?`;
+      const results = await db.query(dbQuery, [tenantId]);
+
+      if (!results.length) {
+        return res.send({
+          success: false,
+          message: `No configuration found for tenantId ${tenantId}`,
+        });
+      }
+
+      res.send({
+        success: true,
+        data: results[0],
+      });
+    } catch (error) {
+      res.send({
+        success: false,
+        message: `Error: ${error.message}`,
+      });
+    }
+  });
+
   // Create tenant endpoint
   app.post(baseEndpoint + "/create", async function (req, res) {
     const tenantId = required(req.body, "tenantId", res);
