@@ -5,3 +5,21 @@ CREATE TABLE tenants (
     tenantName VARCHAR(255) NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE prayers (
+    prayerId INT PRIMARY KEY AUTO_INCREMENT,
+    tenantId BIGINT NOT NULL,
+    messageId VARCHAR(255) NOT NULL,
+    userId BIGINT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId)
+);
+
+CREATE TABLE devotions (
+    devotionId INT PRIMARY KEY AUTO_INCREMENT,
+    tenantId BIGINT NOT NULL,
+    messageId VARCHAR(255) UNIQUE NOT NULL,
+    userId BIGINT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId)
+);

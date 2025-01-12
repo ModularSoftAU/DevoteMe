@@ -77,10 +77,11 @@ export default function tenantApiRoute(app, db) {
     }
   });
 
-  // Edit tenant endpoint
+  // Update tenant endpoint
   app.post(baseEndpoint + "/update", async function (req, res) {
     const tenantId = required(req.body, "tenantId", res);
     const tenantName = required(req.body, "tenantName", res);
+    const tenantConfiguration = required(req.body, "tenantConfiguration", res);
 
     try {
       await db.query(
@@ -88,12 +89,10 @@ export default function tenantApiRoute(app, db) {
           UPDATE tenants 
           SET 
             tenantName=?
+            tenantConfiguration=?
           WHERE tenantId=?;
         `,
-        [
-          tenantName,
-          tenantId
-        ]
+        [tenantName, tenantConfiguration, tenantId]
       );
 
       return res.send({
