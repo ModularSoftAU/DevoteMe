@@ -3,23 +3,18 @@ import { required, optional } from "../common.js";
 export default function tenantApiRoute(app, db) {
   const baseEndpoint = "/api/tenant";
 
+  // Function to fetch tenants
+  async function getTenants(dbQuery) {
+    const [results, fields] = await db.query(dbQuery);
+    return results;
+  }
+
+  // Get tenant(s) endpoint
   app.get(baseEndpoint + "/get", async function (req, res) {
     const tenantId = optional(req.query, "id");
 
     try {
-      function getTenants(dbQuery) {
-        return new Promise((resolve, reject) => {
-          db.query(dbQuery, function (error, results, fields) {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(results);
-            }
-          });
-        });
-      }
-
-      // Get Tenant by specific ID.
+      // Get Tenant by specific ID
       if (tenantId) {
         let dbQuery = `SELECT * FROM tenants WHERE tenantId=${tenantId};`;
         const results = await getTenants(dbQuery);
@@ -59,42 +54,21 @@ export default function tenantApiRoute(app, db) {
     }
   });
 
+  // Create tenant endpoint
   app.post(baseEndpoint + "/create", async function (req, res) {
-    isFeatureEnabled(features.announcements, res, lang);
-
-    const actioningUser = required(req.body, "actioningUser", res);
-    const enabled = required(req.body, "enabled", res);
-    const announcementType = required(req.body, "announcementType", res);
-    const body = optional(req.body, "body", res);
-    const colourMessageFormat = optional(req.body, "colourMessageFormat", res);
-    const link = optional(req.body, "link", res);
+    const tenantId = required(req.body, "tenantId", res);
+    const tenantName = required(req.body, "tenantName", res);
 
     try {
-      db.query(
-        `INSERT INTO announcements (enabled, body, announcementType, link, colourMessageFormat) VALUES (?, ?, ?, ?, ?)`,
-        [
-          enabled,
-          body,
-          announcementType,
-          link,
-          colourMessageFormat,
-          Date.now(),
-        ],
-        function (error, results, fields) {
-          if (error) {
-            return res.send({
-              success: false,
-              message: `${error}`,
-            });
-          }
-
-          res.send({
-            success: true,
-            alertType: "success",
-            content: lang.announcement.announcementCreated,
-          });
-        }
+      await db.query(
+        `INSERT INTO tenants (tenantId, tenantName) VALUES (?, ?)`,
+        [tenantId, tenantName]
       );
+
+      res.send({
+        success: true,
+        content: `New Tenant Created: ${tenantName}`,
+      });
     } catch (error) {
       res.send({
         success: false,
@@ -103,50 +77,29 @@ export default function tenantApiRoute(app, db) {
     }
   });
 
-  app.post(baseEndpoint + "/edit", async function (req, res) {
-    isFeatureEnabled(features.announcements, res, lang);
-
-    const actioningUser = required(req.body, "actioningUser", res);
-    const announcementId = required(req.body, "announcementId", res);
-    const enabled = required(req.body, "enabled", res);
-    const announcementType = required(req.body, "announcementType", res);
-    const body = optional(req.body, "body", res);
-    const colourMessageFormat = optional(req.body, "colourMessageFormat", res);
-    const link = optional(req.body, "link", res);
+  // Edit tenant endpoint
+  app.post(baseEndpoint + "/update", async function (req, res) {
+    const tenantId = required(req.body, "tenantId", res);
+    const tenantName = required(req.body, "tenantName", res);
 
     try {
-      db.query(
+      await db.query(
         `
-          UPDATE announcements 
+          UPDATE tenants 
           SET 
-            enabled=?,
-            announcementType=?,
-            body=?,
-            colourMessageFormat=?,
-            link=? 
-          WHERE announcementId=?;`,
+            tenantName=?
+          WHERE tenantId=?;
+        `,
         [
-          enabled,
-          announcementType,
-          body,
-          colourMessageFormat,
-          link,
-          announcementId,
-        ],
-        function (error, results, fields) {
-          if (error) {
-            return res.send({
-              success: false,
-              message: `${error}`,
-            });
-          }
-
-          return res.send({
-            success: true,
-            message: `lang.announcement.announcementEdited`,
-          });
-        }
+          tenantName,
+          tenantId
+        ]
       );
+
+      return res.send({
+        success: true,
+        message: `Tenant updated`,
+      });
     } catch (error) {
       res.send({
         success: false,

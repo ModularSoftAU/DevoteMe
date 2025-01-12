@@ -1,4 +1,4 @@
-import mysql from "mysql2/promise"; // Use mysql2/promise for async/await
+import mysql from "mysql2";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -10,8 +10,8 @@ const pool = mysql.createPool({
   user: process.env.DBUSER,
   password: process.env.DBPASSWORD,
   database: process.env.DBNAME,
-  multipleStatements: true,
-});
+  multipleStatements: true
+}).promise();
 
 // Function to get a connection and log a message
 async function initializePool() {
