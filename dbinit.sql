@@ -2,42 +2,42 @@ CREATE DATABASE devoteMe;
 USE devoteMe;
 
 CREATE TABLE tenants (
-    tenantId BIGINT PRIMARY KEY,
-    tenantName VARCHAR(255) NOT NULL,
+    tenantId VARCHAR(20) PRIMARY KEY,
+    tenantName VARCHAR(100) NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE tenantConfiguration (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    tenantId BIGINT NOT NULL,
-    devotion_channel BIGINT,
-    votd_channel BIGINT,
+    tenantId VARCHAR(20) NOT NULL,
+    devotion_channel VARCHAR(20),
+    votd_channel VARCHAR(20),
     FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
 );
 
 CREATE TABLE prayers (
     prayerId INT PRIMARY KEY AUTO_INCREMENT,
-    tenantId BIGINT NOT NULL,
+    tenantId VARCHAR(20) NOT NULL,
     messageId VARCHAR(255) NOT NULL,
-    userId BIGINT NOT NULL,
+    userId VARCHAR(20) NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
 );
 
 CREATE TABLE devotions (
     devotionId INT PRIMARY KEY AUTO_INCREMENT,
-    tenantId BIGINT NOT NULL,
+    tenantId VARCHAR(20) NOT NULL,
     messageId VARCHAR(255) UNIQUE NOT NULL,
-    userId BIGINT NOT NULL,
+    userId VARCHAR(20) NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
 );
 
 CREATE TABLE votd (
     votdId INT PRIMARY KEY AUTO_INCREMENT,
-    tenantId BIGINT NOT NULL,
+    tenantId VARCHAR(20) NOT NULL,
     messageId VARCHAR(255) UNIQUE NOT NULL,
-    userId BIGINT NOT NULL,
+    userId VARCHAR(20) NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
 );

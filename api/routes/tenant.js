@@ -104,6 +104,7 @@ export default function tenantApiRoute(app, db) {
         content: `New Tenant Created: ${tenantName}`,
       });
     } catch (error) {
+      console.log(error);      
       res.send({
         success: false,
         message: `${error.message}`,
