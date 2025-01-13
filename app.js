@@ -32,7 +32,7 @@ const buildApp = async () => {
           next();
         });
 
-        const port = process.env.PORT;
+        const port = process.env.PORT || 3000;
 
         app.listen({ port: port, host: '0.0.0.0' }, (err) => {
             if (err) {
