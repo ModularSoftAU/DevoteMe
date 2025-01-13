@@ -87,24 +87,40 @@ export default function tenantApiRoute(app, db) {
     const tenantId = required(req.body, "tenantId", res);
     const tenantName = required(req.body, "tenantName", res);
 
+    console.log(
+      `Received request to create tenant. Tenant ID: ${tenantId}, Tenant Name: ${tenantName}`
+    );
+
     try {
       // Insert into tenants table
+      console.log(`Inserting into tenants table: ${tenantId}, ${tenantName}`);
       await db.query(
         `INSERT INTO tenants (tenantId, tenantName) VALUES (?, ?)`,
         [tenantId, tenantName]
       );
 
       // Insert into tenantConfiguration table with the tenantId
+      console.log(
+        `Inserting into tenantConfiguration table for tenantId: ${tenantId}`
+      );
       await db.query(`INSERT INTO tenantConfiguration (tenantId) VALUES (?)`, [
         tenantId,
       ]);
+
+      console.log(
+        `Successfully created tenant: ${tenantName} (ID: ${tenantId})`
+      );
 
       res.send({
         success: true,
         content: `New Tenant Created: ${tenantName}`,
       });
     } catch (error) {
-      console.log(error);      
+      console.error(
+        `Error occurred while creating tenant: ${tenantName} (ID: ${tenantId})`,
+        error
+      );
+
       res.send({
         success: false,
         message: `${error.message}`,
