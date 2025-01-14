@@ -48,7 +48,7 @@ export function optional(body, field) {
 
 /*
     Makes a POST API request to the specified postURL with the provided apiPostBody.
-    It includes a header with the x-access-token value taken from an environment variable named apiKey.
+    It includes a header with the x-access-token value taken from an environment variable named APIKEY.
     If the request is successful, it logs the response data.
     If the request fails, it sets a cookie with a "danger" alert type and an error message, 
     then redirects the user to the specified failureRedirectURL.
@@ -69,7 +69,7 @@ export async function postAPIRequest(
     body: JSON.stringify(apiPostBody),
     headers: {
       "Content-Type": "application/json",
-      "x-access-token": process.env.apiKey,
+      "x-access-token": process.env.APIKEY,
     },
   });
 
