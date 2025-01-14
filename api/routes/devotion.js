@@ -1,3 +1,4 @@
+import { updateDevotionStreak } from "../../controllers/devotionController.js";
 import { required, optional } from "../common.js";
 
 export default function devotionApiRoute(app, db) {
@@ -38,14 +39,21 @@ export default function devotionApiRoute(app, db) {
     const userId = required(req.body, "userId", res);
 
     try {
+      // Insert the devotion entry
       await db.query(
         `INSERT INTO devotions (tenantId, messageId, userId) VALUES (?, ?, ?)`,
         [tenantId, messageId, userId]
       );
 
+      // Update the devotion streak
+      const streakResult = await updateDevotionStreak(userId, tenantId);
+
+      console.log(streakResult);
+      
+
       res.send({
         success: true,
-        content: `Devotion entry created for tenant ${tenantId} with message ID ${messageId}`,
+        content: `Devotion entry created for tenant ${tenantId} with message ID ${messageId}. ${streakResult.message}`,
       });
     } catch (error) {
       res.send({

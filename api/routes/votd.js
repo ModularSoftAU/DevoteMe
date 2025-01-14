@@ -1,3 +1,4 @@
+import { updateVOTDStreak } from "../../controllers/votdController.js";
 import { required, optional } from "../common.js";
 
 export default function votdApiRoute(app, db) {
@@ -31,26 +32,30 @@ export default function votdApiRoute(app, db) {
     }
   });
 
-  // Add votd endpoint
+  // Add VOTD endpoint
   app.post(baseEndpoint + "/add", async function (req, res) {
     const tenantId = required(req.body, "tenantId", res);
     const messageId = required(req.body, "messageId", res);
     const userId = required(req.body, "userId", res);
 
     try {
+      // Insert the VOTD entry
       await db.query(
         `INSERT INTO votd (tenantId, messageId, userId) VALUES (?, ?, ?)`,
         [tenantId, messageId, userId]
       );
 
+      // Update the VOTD streak
+      const streakResult = await updateVOTDStreak(userId, tenantId);
+
       res.send({
         success: true,
-        content: `VOTD entry created for tenant ${tenantId} with message ID ${messageId}`,
+        content: `VOTD entry created for tenant ${tenantId} with message ID ${messageId}. ${streakResult.message}`,
       });
     } catch (error) {
       res.send({
         success: false,
-        message: `Error creating devotion entry: ${error}`,
+        message: `Error creating VOTD entry: ${error}`,
       });
     }
   });

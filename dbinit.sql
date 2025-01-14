@@ -41,3 +41,23 @@ CREATE TABLE votd (
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
 );
+
+CREATE TABLE devotionStreaks (
+    userId VARCHAR(20) PRIMARY KEY,
+    tenantId VARCHAR(20) NOT NULL,
+    lastDevotionDate DATE,
+    currentStreak INT DEFAULT 0,
+    maxStreak INT DEFAULT 0,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
+);
+
+CREATE TABLE votdStreaks (
+    userId VARCHAR(20) PRIMARY KEY,
+    tenantId VARCHAR(20) NOT NULL,
+    lastVOTDDate DATE,
+    currentStreak INT DEFAULT 0,
+    maxStreak INT DEFAULT 0,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenantId) REFERENCES tenants(tenantId) ON DELETE CASCADE
+);
