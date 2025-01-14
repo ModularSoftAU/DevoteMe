@@ -17,7 +17,6 @@ export default function verifyToken(req, res, done) {
     // Token was incorrect.
     return res.send({
       success: false,
-      token: token,
       message: `lang.api.invalidToken`,
     });
   }
