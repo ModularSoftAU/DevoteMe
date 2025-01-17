@@ -1,3 +1,5 @@
+import db from "../controllers/databaseController.js";
+
 export async function updateVOTDStreak(userId, tenantId) {
   const today = new Date().toISOString().split("T")[0];
 

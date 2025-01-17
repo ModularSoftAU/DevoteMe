@@ -47,9 +47,7 @@ export default function devotionApiRoute(app, db) {
 
       // Update the devotion streak
       const streakResult = await updateDevotionStreak(userId, tenantId);
-
       console.log(streakResult);
-      
 
       res.send({
         success: true,
